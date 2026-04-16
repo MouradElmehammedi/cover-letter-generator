@@ -18,18 +18,9 @@ function saveProfiles() {
 }
 
 function getProfileName(data) {
-  // Try common resume JSON schemas
-  const name =
-    data.basics?.name ||
-    data.name ||
-    data.personalInfo?.name ||
-    data.personal?.name ||
-    [data.basics?.firstName, data.basics?.lastName].filter(Boolean).join(" ") ||
-    [data.firstName, data.lastName].filter(Boolean).join(" ") ||
-    "";
+  // Show the headline/title only (e.g. "Frontend Developer — React/Next.js")
   const headline = data.basics?.label || data.basics?.headline || data.headline || data.title || data.personalInfo?.headline || "";
-  if (name && headline) return `${name} — ${headline}`;
-  return name || headline || "Unnamed Profile";
+  return headline || "Unnamed Profile";
 }
 
 // ── State ──
@@ -287,7 +278,7 @@ function renderProfiles() {
       <input type="radio" name="profile" value="${p.id}" ${p.id === selectedProfileId ? "checked" : ""}
              class="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer" />
       <div class="flex-1 min-w-0">
-        <div class="font-medium text-gray-900 truncate">${escapeHtml(p.displayName)}</div>
+        <div class="font-medium text-gray-900">${escapeHtml(getProfileName(p.data))}</div>
       </div>
       <button data-remove="${p.id}" class="text-gray-400 hover:text-red-500 transition-colors p-1" title="Remove profile">
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
