@@ -380,7 +380,7 @@ generateBtn.addEventListener("click", async () => {
 
 function setLoading(loading) {
   generateBtn.disabled = loading;
-  generateText.textContent = loading ? "Generating..." : "Generate Cover Letter";
+  generateText.textContent = loading ? "Generating..." : "Generate";
   spinner.classList.toggle("hidden", !loading);
 }
 
