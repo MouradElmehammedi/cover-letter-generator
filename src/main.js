@@ -1,5 +1,5 @@
 import "./style.css";
-import { generateCoverLetter } from "./api.js";
+import { generateCoverLetter, generateEmail, generateAnalysis } from "./api.js";
 import { exportToDocx } from "./docx-export.js";
 
 // ── Storage ──
@@ -88,37 +88,60 @@ document.querySelector("#app").innerHTML = `
         </section>
 
         <!-- Actions -->
-        <section class="card grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <select id="language" class="h-11 rounded-lg border border-gray-200 px-4 text-sm text-gray-800
-                                        focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none bg-white">
-            <option value="English">English</option>
-            <option value="French">French</option>
-            <option value="Arabic">Arabic</option>
-            <option value="Spanish">Spanish</option>
-            <option value="German">German</option>
-          </select>
-          <select id="tone" class="h-11 rounded-lg border border-gray-200 px-4 text-sm text-gray-800
-                                    focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none bg-white">
-            <option value="professional">Professional</option>
-            <option value="formal">Formal</option>
-            <option value="dynamic">Dynamic</option>
-          </select>
-          <button id="generate-btn" class="h-11 btn-primary flex items-center gap-2 justify-center text-sm">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" />
-            </svg>
-            <span id="generate-text">Generate</span>
-            <svg id="spinner" class="hidden w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-            </svg>
-          </button>
-          <button id="clear-btn" class="h-11 btn-secondary flex items-center gap-2 justify-center text-sm text-red-500 hover:text-red-700 hover:border-red-200">
-            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
-            </svg>
-            Clear
-          </button>
+        <section class="card space-y-3">
+          <div class="grid grid-cols-2 gap-3">
+            <select id="language" class="h-11 rounded-lg border border-gray-200 px-4 text-sm text-gray-800
+                                          focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none bg-white">
+              <option value="English">English</option>
+              <option value="French">French</option>
+              <option value="Arabic">Arabic</option>
+              <option value="Spanish">Spanish</option>
+              <option value="German">German</option>
+            </select>
+            <select id="tone" class="h-11 rounded-lg border border-gray-200 px-4 text-sm text-gray-800
+                                      focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none bg-white">
+              <option value="professional">Professional</option>
+              <option value="formal">Formal</option>
+              <option value="dynamic">Dynamic</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-[1fr_1fr_1fr_auto] gap-3">
+            <button id="generate-btn" class="h-11 btn-primary flex items-center gap-2 justify-center text-sm whitespace-nowrap">
+              <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.455 2.456L21.75 6l-1.036.259a3.375 3.375 0 0 0-2.455 2.456Z" />
+              </svg>
+              <span id="generate-text">Cover Letter</span>
+              <svg id="spinner" class="hidden w-4 h-4 animate-spin shrink-0" viewBox="0 0 24 24" fill="none">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+            </button>
+            <button id="generate-email-btn" class="h-11 btn-primary flex items-center gap-2 justify-center text-sm whitespace-nowrap">
+              <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+              </svg>
+              <span id="generate-email-text">Email</span>
+              <svg id="email-spinner" class="hidden w-4 h-4 animate-spin shrink-0" viewBox="0 0 24 24" fill="none">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+            </button>
+            <button id="generate-analyze-btn" class="h-11 btn-primary flex items-center gap-2 justify-center text-sm whitespace-nowrap">
+              <svg class="w-4 h-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
+              </svg>
+              <span id="generate-analyze-text">Analyze</span>
+              <svg id="analyze-spinner" class="hidden w-4 h-4 animate-spin shrink-0" viewBox="0 0 24 24" fill="none">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+            </button>
+            <button id="clear-btn" class="h-11 w-11 btn-secondary flex items-center justify-center text-red-500 hover:text-red-700 hover:border-red-200 px-0!" title="Clear all">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+              </svg>
+            </button>
+          </div>
         </section>
 
         <!-- Error -->
@@ -127,7 +150,7 @@ document.querySelector("#app").innerHTML = `
       </div>
 
       <!-- RIGHT: Output -->
-      <div class="lg:sticky lg:top-8">
+      <div class="space-y-6">
         <section id="output-section" class="card hidden">
           <div class="flex items-center justify-between mb-4">
             <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Generated Cover Letter</h2>
@@ -162,6 +185,59 @@ document.querySelector("#app").innerHTML = `
           <p class="text-sm font-medium">Your cover letter will appear here</p>
           <p class="text-xs mt-1">Select a profile, paste a job description, and generate</p>
         </div>
+
+        <!-- Email output -->
+        <section id="email-section" class="card hidden">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Application Email</h2>
+            <div class="flex gap-2">
+              <button id="email-copy-btn" class="btn-secondary flex items-center gap-1.5 text-sm" title="Copy to clipboard">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.666 3.888A2.25 2.25 0 0 0 13.5 2.25h-3c-1.03 0-1.9.693-2.166 1.638m7.332 0c.055.194.084.4.084.612v0a.75.75 0 0 1-.75.75H9.75a.75.75 0 0 1-.75-.75v0c0-.212.03-.418.084-.612m7.332 0c.646.049 1.288.11 1.927.184 1.1.128 1.907 1.077 1.907 2.185V19.5a2.25 2.25 0 0 1-2.25 2.25H6.75A2.25 2.25 0 0 1 4.5 19.5V6.257c0-1.108.806-2.057 1.907-2.185a48.208 48.208 0 0 1 1.927-.184" />
+                </svg>
+                Copy
+              </button>
+              <button id="email-export-btn" class="btn-secondary flex items-center gap-1.5 text-sm" title="Export as DOCX">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                Export DOCX
+              </button>
+            </div>
+          </div>
+          <textarea
+            id="email-text"
+            rows="14"
+            class="w-full rounded-lg border border-gray-200 px-4 py-3 text-sm text-gray-800
+                   focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100 focus:outline-none resize-y"
+          ></textarea>
+          <p id="email-provider-tag" class="mt-2 text-xs text-gray-400"></p>
+        </section>
+
+        <div id="email-placeholder" class="card flex flex-col items-center justify-center py-12 text-gray-300">
+          <svg class="w-10 h-10 mb-3" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+          </svg>
+          <p class="text-sm font-medium">Your application email will appear here</p>
+          <p class="text-xs mt-1">Click "Email" to generate a short HR-friendly email</p>
+        </div>
+
+        <!-- Analysis output -->
+        <section id="analyze-section" class="card hidden">
+          <div class="flex items-center justify-between mb-5">
+            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Profile / Job Fit Analysis</h2>
+            <p id="analyze-provider-tag" class="text-xs text-gray-400"></p>
+          </div>
+          <div id="analyze-content"></div>
+        </section>
+
+        <div id="analyze-placeholder" class="card flex flex-col items-center justify-center py-12 text-gray-300">
+          <svg class="w-10 h-10 mb-3" fill="none" viewBox="0 0 24 24" stroke-width="1" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5M9 11.25v1.5M12 9v3.75m3-6v6" />
+          </svg>
+          <p class="text-sm font-medium">Profile / job fit analysis will appear here</p>
+          <p class="text-xs mt-1">Click "Analyze" for an honest match breakdown</p>
+        </div>
       </div>
 
     </div>
@@ -195,6 +271,22 @@ const copyBtn = document.getElementById("copy-btn");
 const exportBtn = document.getElementById("export-btn");
 const clearBtn = document.getElementById("clear-btn");
 const outputPlaceholder = document.getElementById("output-placeholder");
+const generateEmailBtn = document.getElementById("generate-email-btn");
+const generateEmailText = document.getElementById("generate-email-text");
+const emailSpinner = document.getElementById("email-spinner");
+const emailSection = document.getElementById("email-section");
+const emailText = document.getElementById("email-text");
+const emailProviderTag = document.getElementById("email-provider-tag");
+const emailCopyBtn = document.getElementById("email-copy-btn");
+const emailExportBtn = document.getElementById("email-export-btn");
+const emailPlaceholder = document.getElementById("email-placeholder");
+const generateAnalyzeBtn = document.getElementById("generate-analyze-btn");
+const generateAnalyzeText = document.getElementById("generate-analyze-text");
+const analyzeSpinner = document.getElementById("analyze-spinner");
+const analyzeSection = document.getElementById("analyze-section");
+const analyzeContent = document.getElementById("analyze-content");
+const analyzeProviderTag = document.getElementById("analyze-provider-tag");
+const analyzePlaceholder = document.getElementById("analyze-placeholder");
 
 // ── File upload ──
 addProfileBtn.addEventListener("click", () => fileInput.click());
@@ -371,9 +463,254 @@ generateBtn.addEventListener("click", async () => {
 
 function setLoading(loading) {
   generateBtn.disabled = loading;
-  generateText.textContent = loading ? "Generating..." : "Generate";
+  generateText.textContent = loading ? "Generating..." : "Cover Letter";
   spinner.classList.toggle("hidden", !loading);
 }
+
+function setEmailLoading(loading) {
+  generateEmailBtn.disabled = loading;
+  generateEmailText.textContent = loading ? "Generating..." : "Email";
+  emailSpinner.classList.toggle("hidden", !loading);
+}
+
+// ── Generate Email ──
+generateEmailBtn.addEventListener("click", async () => {
+  hideError();
+
+  const selected = profiles.find((p) => p.id === selectedProfileId);
+  if (!selected) {
+    showError("Please select a profile.");
+    return;
+  }
+  if (!jobDesc.value.trim()) {
+    showError("Please paste a job description.");
+    return;
+  }
+
+  emailText.value = "";
+  emailProviderTag.textContent = "";
+  emailSection.classList.add("hidden");
+  emailPlaceholder.classList.remove("hidden");
+
+  setEmailLoading(true);
+
+  try {
+    const result = await generateEmail({
+      resumes: [selected.data],
+      jobDescription: jobDesc.value.trim(),
+      language: langSelect.value,
+      tone: toneSelect.value,
+    });
+
+    emailText.value = result.text;
+    emailProviderTag.textContent = `Generated via ${result.provider}`;
+    emailSection.classList.remove("hidden");
+    emailPlaceholder.classList.add("hidden");
+  } catch (err) {
+    showError(err.message || "Email generation failed. Please try again.");
+  } finally {
+    setEmailLoading(false);
+  }
+});
+
+// ── Email Copy ──
+emailCopyBtn.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(emailText.value);
+    const orig = emailCopyBtn.innerHTML;
+    emailCopyBtn.innerHTML = `<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" /></svg> Copied!`;
+    setTimeout(() => (emailCopyBtn.innerHTML = orig), 2000);
+  } catch {
+    showError("Failed to copy to clipboard.");
+  }
+});
+
+// ── Email Export DOCX ──
+emailExportBtn.addEventListener("click", () => {
+  exportToDocx(emailText.value);
+});
+
+// ── Analysis JSON parser (tolerant of stray text around the JSON) ──
+function extractJson(text) {
+  const start = text.indexOf("{");
+  const end = text.lastIndexOf("}");
+  if (start === -1 || end === -1) throw new Error("No JSON object found in response.");
+  return JSON.parse(text.slice(start, end + 1));
+}
+
+// ── Analysis dashboard renderer ──
+function escapeHtmlText(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function scoreColor(score) {
+  if (score >= 75) return { ring: "#10b981", text: "text-emerald-600" }; // green
+  if (score >= 50) return { ring: "#f59e0b", text: "text-amber-600" }; // amber
+  return { ring: "#ef4444", text: "text-red-600" }; // red
+}
+
+function ringSvg(score, label) {
+  const s = Math.max(0, Math.min(100, Math.round(score)));
+  const r = 32;
+  const c = 2 * Math.PI * r;
+  const dash = (s / 100) * c;
+  const { ring, text } = scoreColor(s);
+  return `
+    <div class="flex flex-col items-center">
+      <div class="relative w-20 h-20">
+        <svg viewBox="0 0 80 80" class="w-20 h-20 -rotate-90">
+          <circle cx="40" cy="40" r="${r}" stroke="#f3f4f6" stroke-width="6" fill="none" />
+          <circle cx="40" cy="40" r="${r}" stroke="${ring}" stroke-width="6" fill="none"
+                  stroke-dasharray="${dash} ${c}" stroke-linecap="round" />
+        </svg>
+        <div class="absolute inset-0 flex flex-col items-center justify-center">
+          <span class="text-lg font-semibold ${text}">${s}</span>
+          <span class="text-[10px] text-gray-400 -mt-0.5">/ 100</span>
+        </div>
+      </div>
+      <span class="mt-2 text-xs text-gray-500">${escapeHtmlText(label)}</span>
+    </div>
+  `;
+}
+
+function chip(text, variant) {
+  const styles = {
+    matched: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    missing: "bg-red-50 text-red-700 border-red-200",
+    bonus: "bg-blue-50 text-blue-700 border-blue-200",
+  };
+  return `<span class="inline-flex items-center px-2.5 py-1 text-xs rounded-md border ${styles[variant]}">${escapeHtmlText(text)}</span>`;
+}
+
+function reqChip(name, matched) {
+  const cls = matched
+    ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+    : "bg-red-50 text-red-700 border-red-200";
+  const icon = matched ? "✓" : "✗";
+  return `<span class="inline-flex items-center gap-1 px-2.5 py-1 text-xs rounded-md border ${cls}">
+    <span class="font-bold">${icon}</span> ${escapeHtmlText(name)}
+  </span>`;
+}
+
+function renderAnalysis(data) {
+  const matched = (data.matchedSkills || []).slice(0, 6);
+  const missing = (data.missingSkills || []).slice(0, 6);
+  const bonus = (data.bonusSkills || []).slice(0, 6);
+  const required = data.requiredSkills || [];
+
+  const summary = escapeHtmlText(data.summary || "");
+
+  return `
+    <!-- Scores + Summary -->
+    <div class="flex flex-col sm:flex-row items-start gap-6">
+      <div class="flex gap-4">
+        ${ringSvg(data.overallScore ?? 0, "Overall")}
+        ${ringSvg(data.skillMatch ?? 0, "Skill Match")}
+        ${ringSvg(data.experienceFit ?? 0, "Experience")}
+      </div>
+      <p class="text-sm text-gray-700 leading-relaxed flex-1">${summary}</p>
+    </div>
+
+    <!-- Skill columns -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-100">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <h3 class="text-sm font-semibold text-emerald-700">Matched</h3>
+          <span class="text-[11px] px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">${matched.length}</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5">
+          ${matched.length ? matched.map((s) => chip(s, "matched")).join("") : '<span class="text-xs text-gray-400">—</span>'}
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <h3 class="text-sm font-semibold text-red-700">Missing</h3>
+          <span class="text-[11px] px-1.5 py-0.5 rounded bg-red-50 text-red-700">${missing.length}</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5">
+          ${missing.length ? missing.map((s) => chip(s, "missing")).join("") : '<span class="text-xs text-gray-400">—</span>'}
+        </div>
+      </div>
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <h3 class="text-sm font-semibold text-blue-700">Bonus</h3>
+          <span class="text-[11px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700">${bonus.length}</span>
+        </div>
+        <div class="flex flex-wrap gap-1.5">
+          ${bonus.length ? bonus.map((s) => chip(s, "bonus")).join("") : '<span class="text-xs text-gray-400">—</span>'}
+        </div>
+      </div>
+    </div>
+
+    ${
+      required.length
+        ? `
+    <!-- Job requirements -->
+    <div class="mt-6 pt-6 border-t border-gray-100">
+      <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Job Requirements</h3>
+      <div class="flex flex-wrap gap-1.5">
+        ${required.map((r) => reqChip(r.name, !!r.matched)).join("")}
+      </div>
+    </div>`
+        : ""
+    }
+  `;
+}
+
+// ── Generate Analysis ──
+function setAnalyzeLoading(loading) {
+  generateAnalyzeBtn.disabled = loading;
+  generateAnalyzeText.textContent = loading ? "Analyzing..." : "Analyze";
+  analyzeSpinner.classList.toggle("hidden", !loading);
+}
+
+generateAnalyzeBtn.addEventListener("click", async () => {
+  hideError();
+
+  const selected = profiles.find((p) => p.id === selectedProfileId);
+  if (!selected) {
+    showError("Please select a profile.");
+    return;
+  }
+  if (!jobDesc.value.trim()) {
+    showError("Please paste a job description.");
+    return;
+  }
+
+  analyzeContent.innerHTML = "";
+  analyzeProviderTag.textContent = "";
+  analyzeSection.classList.add("hidden");
+  analyzePlaceholder.classList.remove("hidden");
+
+  setAnalyzeLoading(true);
+
+  try {
+    const result = await generateAnalysis({
+      resumes: [selected.data],
+      jobDescription: jobDesc.value.trim(),
+      language: langSelect.value,
+    });
+
+    let data;
+    try {
+      data = extractJson(result.text);
+    } catch (err) {
+      throw new Error("AI returned invalid JSON. Please try again.");
+    }
+
+    analyzeContent.innerHTML = renderAnalysis(data);
+    analyzeProviderTag.textContent = `via ${result.provider}`;
+    analyzeSection.classList.remove("hidden");
+    analyzePlaceholder.classList.add("hidden");
+  } catch (err) {
+    showError(err.message || "Analysis failed. Please try again.");
+  } finally {
+    setAnalyzeLoading(false);
+  }
+});
 
 // ── Copy ──
 copyBtn.addEventListener("click", async () => {
@@ -401,6 +738,14 @@ clearBtn.addEventListener("click", () => {
   providerTag.textContent = "";
   outputSection.classList.add("hidden");
   outputPlaceholder.classList.remove("hidden");
+  emailText.value = "";
+  emailProviderTag.textContent = "";
+  emailSection.classList.add("hidden");
+  emailPlaceholder.classList.remove("hidden");
+  analyzeContent.innerHTML = "";
+  analyzeProviderTag.textContent = "";
+  analyzeSection.classList.add("hidden");
+  analyzePlaceholder.classList.remove("hidden");
   hideError();
 });
 

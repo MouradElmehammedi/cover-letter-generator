@@ -6,13 +6,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { resumes, jobDescription, language, tone } = req.body;
+    const { resumes, jobDescription, language, tone, type } = req.body;
 
     if (!resumes?.length || !jobDescription) {
       return res.status(400).json({ error: 'Resumes and job description are required.' });
     }
 
-    const result = await generateWithFallback({ resumes, jobDescription, language, tone });
+    const result = await generateWithFallback({ resumes, jobDescription, language, tone, type });
     res.status(200).json(result);
   } catch (err) {
     console.error('Generate API error:', err);
