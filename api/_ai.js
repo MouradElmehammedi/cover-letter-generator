@@ -2,17 +2,18 @@
 
 export function loadProviders() {
   const providers = [];
-  for (let i = 1; i <= 4; i++) {
+  for (let i = 1; i <= 10; i++) {
     const suffix = i === 1 ? '' : `_${i}`;
     const provider = process.env[`AI_PROVIDER${suffix}`];
+    if (!provider) continue;
     const apiKey = process.env[`AI_API_KEY${suffix}`];
-    if (provider && apiKey) {
-      providers.push({
-        name: provider,
-        apiKey,
-        model: process.env[`AI_MODEL${suffix}`] || null,
-      });
-    }
+    // Ollama is self-hosted — no API key required
+    if (provider !== 'ollama' && !apiKey) continue;
+    providers.push({
+      name: provider,
+      apiKey: apiKey || null,
+      model: process.env[`AI_MODEL${suffix}`] || null,
+    });
   }
   return providers;
 }
@@ -73,6 +74,17 @@ function getProviderConfig(provider) {
           'Content-Type': 'application/json',
         },
       };
+    case 'ollama': {
+      // Self-hosted Ollama exposes an OpenAI-compatible endpoint at /v1/chat/completions
+      const base = (process.env.OLLAMA_BASE_URL || 'http://localhost:11434').replace(/\/+$/, '');
+      return {
+        url: `${base}/v1/chat/completions`,
+        model: provider.model || process.env.OLLAMA_MODEL || 'llama3.2',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      };
+    }
     default:
       return null;
   }

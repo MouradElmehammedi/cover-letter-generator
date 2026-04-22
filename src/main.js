@@ -31,49 +31,63 @@ let selectedProfileId = profiles.length > 0 ? profiles[0].id : null;
 document.querySelector("#app").innerHTML = `
 <div class="min-h-screen">
   <!-- Header -->
-  <header class="border-b border-gray-200 bg-white">
-    <div class="max-w-7xl mx-auto px-6 py-5 flex items-center gap-3">
-      <img src="/logo.jpg" alt="Logo" class="w-8 h-8 rounded object-cover" />
-      <h1 class="text-xl font-semibold text-gray-900">AI Cover Letter Generator</h1>
+  <header class="border-b border-gray-200 bg-white sticky top-0 z-30">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between gap-4 flex-wrap">
+      <div class="flex items-center gap-6 min-w-0">
+        <div class="flex items-center gap-3 shrink-0">
+          <img src="/logo.jpg" alt="Logo" class="w-8 h-8 rounded object-cover" />
+          <h1 class="text-lg font-semibold text-gray-900 whitespace-nowrap">AI Job Assistant</h1>
+        </div>
+        <nav class="tab-nav shrink-0">
+          <button id="tab-generator" class="tab-btn tab-active" onclick="switchToGeneratorTab()">Generator</button>
+          <button id="tab-jobs" class="tab-btn" onclick="switchToJobsTab()">Find Jobs</button>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-2 min-w-0">
+        <div id="profile-selector" class="profile-selector shrink-0">
+          <button id="profile-trigger" type="button" class="profile-trigger profile-trigger-compact" data-selected-id="" aria-haspopup="listbox" aria-expanded="false">
+            <div class="profile-avatar profile-avatar-sm">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+              </svg>
+            </div>
+            <span id="profile-selected-name" class="text-sm font-medium text-gray-900 truncate max-w-[200px]">No profile yet</span>
+            <svg class="profile-chevron w-4 h-4 text-gray-400 transition-transform shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+            </svg>
+          </button>
+          <div id="profile-menu" class="profile-menu hidden" role="listbox"></div>
+        </div>
+
+        <button id="add-profile-btn" class="btn-secondary flex items-center gap-1.5 text-sm shrink-0" title="Upload JSON resume">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Add
+        </button>
+        <input type="file" id="file-input" multiple accept=".json" class="hidden" />
+      </div>
     </div>
   </header>
 
-  <main class="max-w-7xl mx-auto px-6 py-8">
+  <!-- Drop zone overlay (appears on page-level drag) -->
+  <div id="drop-zone" class="drop-zone-overlay hidden">
+    <div class="drop-zone-inner">
+      <svg class="w-12 h-12 mx-auto text-indigo-400 mb-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
+      </svg>
+      <p class="text-lg font-semibold text-gray-800">Drop JSON resume files here</p>
+      <p class="text-sm text-gray-500 mt-1">They'll be added to your profiles</p>
+    </div>
+  </div>
+
+  <main id="generator-view" class="max-w-7xl mx-auto px-6 py-8">
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
 
       <!-- LEFT: Form -->
       <div class="space-y-6">
 
-        <!-- Profiles -->
-        <section class="card">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Profiles</h2>
-            <button id="add-profile-btn" class="btn-secondary flex items-center gap-1.5 text-sm">
-              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-              Add Profile
-            </button>
-            <input type="file" id="file-input" multiple accept=".json" class="hidden" />
-          </div>
-
-          <div id="drop-zone" class="drop-zone hidden">
-            <svg class="w-10 h-10 mx-auto text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" />
-            </svg>
-            <p class="text-gray-600 font-medium">Drop JSON resume files here</p>
-            <p class="text-sm text-gray-400 mt-1">or click to browse</p>
-          </div>
-
-          <div id="profiles-empty" class="text-center py-8 text-gray-400 text-sm hidden">
-            <svg class="w-8 h-8 mx-auto mb-2 text-gray-300" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-            </svg>
-            No profiles yet. Upload a JSON resume to get started.
-          </div>
-
-          <ul id="profile-list" class="space-y-2 hidden"></ul>
-        </section>
 
         <!-- Job Description -->
         <section class="card">
@@ -245,7 +259,7 @@ document.querySelector("#app").innerHTML = `
 
   <footer class="border-t border-gray-100 mt-12">
     <div class="max-w-7xl mx-auto px-6 py-4 text-center text-xs text-gray-400">
-      AI Cover Letter Generator &mdash; Your data stays in your browser
+      AI Job Assistant &mdash; Your data stays in your browser
     </div>
   </footer>
 </div>
@@ -255,8 +269,10 @@ document.querySelector("#app").innerHTML = `
 const dropZone = document.getElementById("drop-zone");
 const fileInput = document.getElementById("file-input");
 const addProfileBtn = document.getElementById("add-profile-btn");
-const profileList = document.getElementById("profile-list");
-const profilesEmpty = document.getElementById("profiles-empty");
+const profileSelector = document.getElementById("profile-selector");
+const profileTrigger = document.getElementById("profile-trigger");
+const profileSelectedName = document.getElementById("profile-selected-name");
+const profileMenu = document.getElementById("profile-menu");
 const jobDesc = document.getElementById("job-description");
 const langSelect = document.getElementById("language");
 const toneSelect = document.getElementById("tone");
@@ -307,7 +323,7 @@ fileInput.addEventListener("change", () => {
   fileInput.value = "";
 });
 
-// Show drop zone on page-level drag
+// Show drop zone overlay on page-level drag
 document.addEventListener("dragover", (e) => {
   e.preventDefault();
   dropZone.classList.remove("hidden");
@@ -315,12 +331,12 @@ document.addEventListener("dragover", (e) => {
 });
 document.addEventListener("dragleave", (e) => {
   if (!e.relatedTarget || e.relatedTarget === document.documentElement) {
-    if (profiles.length > 0) dropZone.classList.add("hidden");
+    dropZone.classList.add("hidden");
     dropZone.classList.remove("dragover");
   }
 });
 document.addEventListener("drop", () => {
-  if (profiles.length > 0) dropZone.classList.add("hidden");
+  dropZone.classList.add("hidden");
   dropZone.classList.remove("dragover");
 });
 
@@ -349,61 +365,110 @@ function handleFiles(files) {
   }
 }
 
+function closeProfileMenu() {
+  profileMenu.classList.add("hidden");
+  profileTrigger.setAttribute("aria-expanded", "false");
+}
+
+function openProfileMenu() {
+  profileMenu.classList.remove("hidden");
+  profileTrigger.setAttribute("aria-expanded", "true");
+}
+
 function renderProfiles() {
   if (profiles.length === 0) {
-    profileList.classList.add("hidden");
-    profilesEmpty.classList.remove("hidden");
-    dropZone.classList.remove("hidden");
+    closeProfileMenu();
+    profileTrigger.dataset.selectedId = "";
+    profileTrigger.classList.add("profile-trigger-empty");
+    profileSelectedName.textContent = "No profile yet";
+    profileMenu.innerHTML = "";
     return;
   }
 
-  profilesEmpty.classList.add("hidden");
-  dropZone.classList.add("hidden");
-  profileList.classList.remove("hidden");
+  profileTrigger.classList.remove("profile-trigger-empty");
 
-  profileList.innerHTML = profiles
-    .map(
-      (p) => `
-    <li class="flex items-center gap-3 rounded-lg px-4 py-3 text-sm cursor-pointer transition-colors
-               ${p.id === selectedProfileId ? "bg-indigo-50 border border-indigo-200" : "bg-gray-50 border border-transparent hover:bg-gray-100"}"
-        data-select="${p.id}">
-      <input type="radio" name="profile" value="${p.id}" ${p.id === selectedProfileId ? "checked" : ""}
-             class="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 cursor-pointer" />
-      <div class="flex-1 min-w-0">
-        <div class="font-medium text-gray-900">${escapeHtml(getProfileName(p.data))}</div>
-      </div>
-      <button data-remove="${p.id}" class="text-gray-400 hover:text-red-500 transition-colors p-1" title="Remove profile">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </li>`,
-    )
+  // Ensure the selected profile still exists
+  if (!profiles.find((p) => p.id === selectedProfileId)) {
+    selectedProfileId = profiles[0].id;
+  }
+  const active = profiles.find((p) => p.id === selectedProfileId);
+  profileTrigger.dataset.selectedId = active.id;
+  profileSelectedName.textContent = getProfileName(active.data);
+
+  profileMenu.innerHTML = profiles
+    .map((p) => {
+      const isSelected = p.id === selectedProfileId;
+      return `
+      <div class="profile-menu-item ${isSelected ? "profile-menu-item-selected" : ""}" role="option" aria-selected="${isSelected}" data-select="${p.id}" tabindex="0">
+        <div class="profile-avatar profile-avatar-sm">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+        </div>
+        <span class="flex-1 text-sm font-medium text-gray-900 truncate">${escapeHtml(getProfileName(p.data))}</span>
+        ${isSelected ? `
+          <svg class="w-4 h-4 text-indigo-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+          </svg>` : ""}
+        <button type="button" class="profile-remove" data-remove="${p.id}" title="Remove profile" aria-label="Remove profile">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>`;
+    })
     .join("");
-
-  // Select profile on row click
-  profileList.querySelectorAll("[data-select]").forEach((li) => {
-    li.addEventListener("click", (e) => {
-      if (e.target.closest("[data-remove]")) return;
-      selectedProfileId = li.dataset.select;
-      renderProfiles();
-    });
-  });
-
-  // Remove profile
-  profileList.querySelectorAll("[data-remove]").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const id = btn.dataset.remove;
-      profiles = profiles.filter((p) => p.id !== id);
-      saveProfiles();
-      if (selectedProfileId === id) {
-        selectedProfileId = profiles.length > 0 ? profiles[0].id : null;
-      }
-      renderProfiles();
-    });
-  });
 }
+
+// Toggle menu
+profileTrigger.addEventListener("click", () => {
+  if (profileMenu.classList.contains("hidden")) openProfileMenu();
+  else closeProfileMenu();
+});
+
+// Close on outside click
+document.addEventListener("click", (e) => {
+  if (!profileSelector.contains(e.target)) closeProfileMenu();
+});
+
+// Close on Escape
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") closeProfileMenu();
+});
+
+// Delegate menu item actions
+profileMenu.addEventListener("click", (e) => {
+  const removeBtn = e.target.closest("[data-remove]");
+  if (removeBtn) {
+    e.stopPropagation();
+    const id = removeBtn.dataset.remove;
+    profiles = profiles.filter((p) => p.id !== id);
+    saveProfiles();
+    if (selectedProfileId === id) {
+      selectedProfileId = profiles.length > 0 ? profiles[0].id : null;
+    }
+    renderProfiles();
+    return;
+  }
+
+  const item = e.target.closest("[data-select]");
+  if (item) {
+    selectedProfileId = item.dataset.select;
+    renderProfiles();
+    closeProfileMenu();
+  }
+});
+
+// Keyboard selection on menu items
+profileMenu.addEventListener("keydown", (e) => {
+  const item = e.target.closest("[data-select]");
+  if (item && (e.key === "Enter" || e.key === " ")) {
+    e.preventDefault();
+    selectedProfileId = item.dataset.select;
+    renderProfiles();
+    closeProfileMenu();
+  }
+});
 
 function escapeHtml(str) {
   const div = document.createElement("div");
@@ -751,3 +816,34 @@ clearBtn.addEventListener("click", () => {
 
 // ── Init ──
 renderProfiles();
+
+// --- Tab switching (Job Search Module) ---
+
+window.switchToGeneratorTab = function () {
+  document.getElementById('generator-view')?.classList.remove('hidden')
+  document.getElementById('jobs-view')?.classList.add('hidden')
+  document.getElementById('tab-generator')?.classList.add('tab-active')
+  document.getElementById('tab-jobs')?.classList.remove('tab-active')
+}
+
+window.switchToJobsTab = function () {
+  document.getElementById('generator-view')?.classList.add('hidden')
+  document.getElementById('jobs-view')?.classList.remove('hidden')
+  document.getElementById('tab-generator')?.classList.remove('tab-active')
+  document.getElementById('tab-jobs')?.classList.add('tab-active')
+}
+
+window.getActiveProfile = function () {
+  const allProfiles = JSON.parse(localStorage.getItem('clg_profiles') || '[]')
+  const selectedId = document.getElementById('profile-trigger')?.dataset.selectedId
+  return allProfiles.find(p => p.id === selectedId) ?? null
+}
+
+window.triggerGeneration = function (type) {
+  const btn = type === 'cover-letter'
+    ? document.getElementById('generate-btn')
+    : type === 'email'
+    ? document.getElementById('generate-email-btn')
+    : null
+  btn?.click()
+}

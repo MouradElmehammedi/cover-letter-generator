@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import { createServer as createViteServer } from 'vite';
 import { generateWithFallback } from './api/_ai.js';
+import jobsHandler from './api/jobs.js';
 
 const app = express();
 app.use(express.json({ limit: '2mb' }));
@@ -19,6 +20,8 @@ app.post('/api/generate', async (req, res) => {
     res.status(502).json({ error: 'All AI providers failed.', details: err.message });
   }
 });
+
+app.get('/api/jobs', (req, res) => jobsHandler(req, res));
 
 const vite = await createViteServer({ server: { middlewareMode: true } });
 app.use(vite.middlewares);

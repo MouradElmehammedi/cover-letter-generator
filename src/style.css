@@ -11,13 +11,16 @@
 }
 
 @layer components {
-  .drop-zone {
-    @apply border-2 border-dashed border-gray-300 rounded-xl p-8 text-center
-           transition-colors duration-200 cursor-pointer;
+  .drop-zone-overlay {
+    @apply fixed inset-0 z-50 bg-indigo-50/85 backdrop-blur-sm
+           flex items-center justify-center p-8 pointer-events-none;
   }
-  .drop-zone:hover,
-  .drop-zone.dragover {
-    @apply border-indigo-400 bg-indigo-50/50;
+  .drop-zone-inner {
+    @apply border-4 border-dashed border-indigo-400 rounded-3xl
+           px-16 py-12 text-center bg-white/95 shadow-lg;
+  }
+  .drop-zone-overlay.dragover .drop-zone-inner {
+    @apply border-indigo-600 bg-indigo-50;
   }
   .btn-primary {
     @apply bg-indigo-600 text-white px-6 py-3 rounded-lg font-medium
@@ -33,5 +36,195 @@
   .card {
     @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-6;
   }
+
+  /* --- Profile selector (dropdown) --- */
+
+  .profile-selector { @apply relative; }
+
+  .profile-trigger {
+    @apply w-full flex items-center gap-3 bg-gray-50 hover:bg-gray-100 rounded-xl px-3.5 py-2.5
+           border border-gray-200 hover:border-gray-300 transition-colors cursor-pointer
+           focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300;
+  }
+  .profile-trigger[aria-expanded="true"] { @apply border-indigo-300 bg-white ring-2 ring-indigo-100; }
+  .profile-trigger[aria-expanded="true"] .profile-chevron { @apply rotate-180; }
+
+  /* Compact variant for the header */
+  .profile-trigger-compact { @apply w-auto rounded-full px-2 py-1.5 gap-2; }
+
+  /* Empty / no-profile state — subtle gray */
+  .profile-trigger-empty .profile-avatar { @apply bg-gray-100 text-gray-400; }
+  .profile-trigger-empty #profile-selected-name { @apply text-gray-400 italic; }
+
+  .profile-avatar {
+    @apply w-10 h-10 rounded-full bg-indigo-100 text-indigo-600
+           flex items-center justify-center shrink-0;
+  }
+  .profile-avatar-sm { @apply w-8 h-8; }
+
+  .profile-menu {
+    @apply absolute top-full right-0 mt-2 min-w-[260px] bg-white rounded-xl
+           border border-gray-200 shadow-lg overflow-hidden z-40
+           max-h-80 overflow-y-auto p-1;
+  }
+
+  .profile-menu-item {
+    @apply flex items-center gap-3 px-2.5 py-2 rounded-lg hover:bg-gray-50
+           cursor-pointer transition-colors focus:outline-none focus:bg-gray-50;
+  }
+  .profile-menu-item-selected { @apply bg-indigo-50 hover:bg-indigo-50; }
+
+  .profile-remove {
+    @apply text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors
+           p-1.5 rounded-md shrink-0 cursor-pointer;
+  }
+
+  /* --- Job Search Module --- */
+
+  .tab-nav { @apply flex gap-1; }
+  .tab-btn { @apply px-4 py-2 text-sm font-medium text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-50 transition-colors cursor-pointer; }
+  .tab-btn.tab-active { @apply text-indigo-700 bg-indigo-50; }
+
+  .jobs-view { @apply max-w-3xl mx-auto py-6 px-4 flex flex-col gap-6; }
+
+  /* Filter bar card */
+  .jobs-filter-bar {
+    @apply bg-white rounded-2xl border border-gray-200 p-5 flex flex-col gap-5 shadow-sm;
+  }
+
+  /* Primary search row (role + country + city) */
+  .jobs-primary-row { @apply flex flex-col sm:flex-row gap-2; }
+  .jobs-select-country { @apply sm:w-40; }
+  .jobs-select-city { @apply sm:w-44; }
+
+  /* Input wrapper with leading icon */
+  .jobs-input-wrap {
+    @apply flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3.5 h-11
+           transition-all duration-150
+           hover:bg-white hover:border-gray-300
+           focus-within:bg-white focus-within:border-indigo-400
+           focus-within:ring-4 focus-within:ring-indigo-100;
+  }
+  .jobs-input-wrap-grow { @apply flex-1; }
+  .jobs-input-wrap-loc { @apply sm:w-56; }
+
+  .jobs-input-icon { @apply w-4 h-4 text-gray-400 shrink-0; }
+
+  .jobs-input-bare {
+    @apply flex-1 bg-transparent border-0 outline-none text-sm text-gray-900
+           placeholder:text-gray-400;
+  }
+  .jobs-input-bare:focus { @apply outline-none ring-0; }
+
+  /* Quick filters row */
+  .jobs-filter-row { @apply flex flex-wrap gap-2 items-center; }
+
+  /* Selects — same height as inputs */
+  .jobs-select {
+    @apply rounded-xl border border-gray-200 bg-gray-50 px-3 h-11 text-sm text-gray-800
+           cursor-pointer transition-all duration-150
+           hover:bg-white hover:border-gray-300
+           focus:outline-none focus:bg-white focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100;
+  }
+
+  /* Chip group (label + chips) */
+  .jobs-chip-group { @apply flex items-center flex-wrap gap-3; }
+  .jobs-group-label {
+    @apply text-[11px] font-semibold uppercase tracking-wider text-gray-400 shrink-0 min-w-[56px];
+  }
+
+  .jobs-chips { @apply flex flex-wrap gap-1.5; }
+
+  /* Chip toggle (checkbox wrapped in label) */
+  .jobs-chip {
+    @apply relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
+           border border-gray-200 bg-white text-sm font-medium text-gray-700
+           cursor-pointer select-none transition-all duration-150
+           hover:bg-gray-50 hover:border-gray-300;
+  }
+  .jobs-chip input {
+    @apply absolute opacity-0 w-0 h-0 pointer-events-none;
+  }
+  .jobs-chip:has(input:checked) {
+    @apply bg-indigo-600 border-indigo-600 text-white shadow-sm;
+  }
+  .jobs-chip:has(input:checked):hover {
+    @apply bg-indigo-700 border-indigo-700;
+  }
+
+  /* Actions row — hint left, buttons right */
+  .jobs-actions {
+    @apply flex items-center justify-between flex-wrap gap-3 pt-3 mt-1 border-t border-gray-100;
+  }
+  .jobs-actions-btns { @apply flex items-center gap-2 ml-auto; }
+
+  /* Primary "Search Jobs" button */
+  .btn-primary-jobs {
+    @apply inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800
+           text-white px-5 py-2.5 rounded-xl font-semibold text-sm
+           transition-all duration-150 shadow-sm hover:shadow
+           disabled:opacity-50 disabled:cursor-not-allowed
+           focus:outline-none focus:ring-4 focus:ring-indigo-200;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-gray-600 px-4 py-2 rounded-xl font-medium
+           border border-gray-200 hover:bg-gray-50 hover:border-gray-300
+           active:bg-gray-100 transition-colors duration-150;
+  }
+  .btn-sm { @apply px-3 py-1.5 text-xs rounded-lg; }
+
+  .jobs-hint { @apply text-xs text-gray-500 flex items-center gap-1.5; }
+  .jobs-ratelimit-banner { @apply bg-amber-50 border border-amber-300 text-amber-800 text-sm rounded-lg px-4 py-2; }
+  .jobs-results-meta { @apply text-sm text-gray-500; }
+  .jobs-skipped { @apply text-amber-600 font-medium; }
+  .jobs-results-list { @apply flex flex-col gap-4; }
+  .jobs-load-more-wrap { @apply flex justify-center py-4; }
+
+  .job-card { @apply bg-white rounded-2xl border border-gray-200 p-5 shadow-sm flex flex-col gap-3 transition-shadow hover:shadow-md; }
+  .job-card-header { @apply flex flex-col gap-1; }
+  .job-card-title-block { @apply flex flex-col; }
+  .job-card-title { @apply text-base font-semibold text-gray-900; }
+  .job-card-company { @apply text-sm text-indigo-600 font-medium; }
+  .job-card-meta { @apply flex flex-wrap gap-2 items-center text-xs text-gray-500; }
+  .job-card-location { @apply font-medium; }
+  .job-card-date { }
+  .job-card-publisher { @apply italic; }
+  .job-card-snippet { @apply text-sm text-gray-600 leading-relaxed; }
+  .job-card-actions { @apply flex flex-wrap gap-2 pt-1; }
+  .job-card-full-jd { @apply mt-2 border-t border-gray-100 pt-3; }
+  .job-card-jd-text { @apply text-xs text-gray-600 whitespace-pre-wrap leading-relaxed max-h-64 overflow-y-auto; }
+  .job-card-analysis-panel { @apply mt-2 border-t border-gray-100 pt-4; }
+
+  .analysis-panel { @apply flex flex-col gap-4; }
+  .analysis-scores { @apply flex gap-6 justify-center; }
+  .analysis-summary { @apply text-sm text-gray-700 leading-relaxed; }
+  .analysis-skills { @apply flex flex-col gap-2; }
+  .analysis-actions { @apply flex gap-2 flex-wrap pt-2; }
+  .skill-group { @apply flex flex-wrap gap-2 items-center; }
+  .skill-group-label { @apply text-xs font-semibold uppercase tracking-wide; }
+  .skill-group-label.matched { @apply text-green-600; }
+  .skill-group-label.missing { @apply text-red-500; }
+  .skill-group-label.bonus { @apply text-indigo-500; }
+
+  .chip { @apply text-xs px-2 py-0.5 rounded-full border font-medium; }
+  .chip-remote { @apply bg-indigo-50 text-indigo-700 border-indigo-200; }
+  .chip-matched { @apply bg-green-50 text-green-700 border-green-200; }
+  .chip-missing { @apply bg-red-50 text-red-600 border-red-200; }
+  .chip-bonus { @apply bg-indigo-50 text-indigo-600 border-indigo-200; }
+  .chip-applied { @apply bg-emerald-50 text-emerald-700 border-emerald-300; }
+  .chip-in-process { @apply bg-amber-50 text-amber-700 border-amber-300; }
+
+  .job-card-applied { @apply bg-emerald-50/30 border-emerald-200; }
+  .job-card-applied .job-card-title { @apply text-gray-500 line-through decoration-emerald-400/50 decoration-1; }
+
+  .btn-applied {
+    @apply bg-emerald-100 text-emerald-800 border border-emerald-300
+           hover:bg-emerald-200 active:bg-emerald-300
+           transition-colors duration-150 font-medium rounded-lg px-4 py-2;
+  }
+
+  .skeleton { @apply animate-pulse bg-gray-100 rounded-2xl; }
+  .skeleton-card { @apply h-36 w-full; }
 }
 
