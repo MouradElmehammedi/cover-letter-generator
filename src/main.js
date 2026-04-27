@@ -1,6 +1,7 @@
 import "./style.css";
 import { generateCoverLetter, generateEmail, generateAnalysis } from "./api.js";
 import { exportToDocx } from "./docx-export.js";
+import { exportToPdf } from "./pdf-export.js";
 
 // ── Storage ──
 const STORAGE_KEY = "clg_profiles";
@@ -181,6 +182,12 @@ document.querySelector("#app").innerHTML = `
                 </svg>
                 Export DOCX
               </button>
+              <button id="export-pdf-btn" class="btn-secondary flex items-center gap-1.5 text-sm" title="Export as PDF">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                Export PDF
+              </button>
             </div>
           </div>
           <textarea
@@ -216,6 +223,12 @@ document.querySelector("#app").innerHTML = `
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
                 </svg>
                 Export DOCX
+              </button>
+              <button id="email-export-pdf-btn" class="btn-secondary flex items-center gap-1.5 text-sm" title="Export as PDF">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                Export PDF
               </button>
             </div>
           </div>
@@ -285,6 +298,7 @@ const outputText = document.getElementById("output-text");
 const providerTag = document.getElementById("provider-tag");
 const copyBtn = document.getElementById("copy-btn");
 const exportBtn = document.getElementById("export-btn");
+const exportPdfBtn = document.getElementById("export-pdf-btn");
 const clearBtn = document.getElementById("clear-btn");
 const outputPlaceholder = document.getElementById("output-placeholder");
 const generateEmailBtn = document.getElementById("generate-email-btn");
@@ -295,6 +309,7 @@ const emailText = document.getElementById("email-text");
 const emailProviderTag = document.getElementById("email-provider-tag");
 const emailCopyBtn = document.getElementById("email-copy-btn");
 const emailExportBtn = document.getElementById("email-export-btn");
+const emailExportPdfBtn = document.getElementById("email-export-pdf-btn");
 const emailPlaceholder = document.getElementById("email-placeholder");
 const generateAnalyzeBtn = document.getElementById("generate-analyze-btn");
 const generateAnalyzeText = document.getElementById("generate-analyze-text");
@@ -595,6 +610,11 @@ emailExportBtn.addEventListener("click", () => {
   exportToDocx(emailText.value);
 });
 
+// ── Email Export PDF ──
+emailExportPdfBtn.addEventListener("click", () => {
+  exportToPdf(emailText.value);
+});
+
 // ── Analysis JSON parser (tolerant of stray text around the JSON) ──
 function extractJson(text) {
   const start = text.indexOf("{");
@@ -792,6 +812,11 @@ copyBtn.addEventListener("click", async () => {
 // ── Export DOCX ──
 exportBtn.addEventListener("click", () => {
   exportToDocx(outputText.value);
+});
+
+// ── Export PDF ──
+exportPdfBtn.addEventListener("click", () => {
+  exportToPdf(outputText.value);
 });
 
 // ── Clear All ──
